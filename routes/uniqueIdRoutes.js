@@ -23,26 +23,30 @@ const getTime = async () => {
     }
 }
 
-uniqueTimerRoute.get("/", async (req, res) => {
-    try {
-        const dateTime = await getTime();
-        if (dateTime) {
-            const result = await UniqueIdModal.find({ uniqueId: dateTime });
-            if (result[0]) {
-                res.status(200).send(result);
-            } else {
-                const data = await new UniqueIdModal({ uniqueId: dateTime });
-                data.save();
-                const newresult = await UniqueIdModal.find({ uniqueId: dateTime });
-                res.status(200).send(newresult);
-            }
-        }else{
-            res.status(400).send({ "msg": "Time does not exists" });
-        }
+uniqueTimerRoute.post("/", async (req, res) => {
+    let payload = req.body;
 
+    try {
+        let result = await new UniqueIdModal(payload);
+        // let result = await UniqueIdModal.insertOne(payload);
+        result.save();
+        // res.status(200).send("done");
+        res.status(200).send({ "msg": "amount added successfully"});
     } catch (error) {
         res.status(400).send({ "msg": "Some Error" });
-        console.log(error);
+        console.log(error.message);
+    }
+});
+
+uniqueTimerRoute.get("/", async (req, res) => {
+    let query = req.query;
+
+    try {
+        let result = await UniqueIdModal.find(query);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(400).send({ "msg": "Some Error" });
+        console.log(error.message);
     }
 });
 
