@@ -5,7 +5,9 @@ const uniqueIdSchema = mongoose.Schema({
     date: String,
     userId: String,
     amount: Number,
-    choice: String
+    choice: String,
+    result: String,
+    currentTime: String
 },
 {
     versionKey: false

@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const winnerSchema = mongoose.Schema({
     timeId: String,
     uniqueUserId: String,
+    currentTime: String
 }, {
     versionKey: false
 });

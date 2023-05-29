@@ -28,10 +28,8 @@ uniqueTimerRoute.post("/", async (req, res) => {
 
     try {
         let result = await new UniqueIdModal(payload);
-        // let result = await UniqueIdModal.insertOne(payload);
         result.save();
-        // res.status(200).send("done");
-        res.status(200).send({ "msg": "amount added successfully"});
+        res.status(200).send({ "msg": "amount added successfully" });
     } catch (error) {
         res.status(400).send({ "msg": "Some Error" });
         console.log(error.message);
@@ -40,14 +38,43 @@ uniqueTimerRoute.post("/", async (req, res) => {
 
 uniqueTimerRoute.get("/", async (req, res) => {
     let query = req.query;
+    let page = query.page;
+    let limit = query.limit;
 
-    try {
-        let result = await UniqueIdModal.find(query);
-        res.status(200).send(result);
-    } catch (error) {
-        res.status(400).send({ "msg": "Some Error" });
-        console.log(error.message);
+    if (page && limit) {
+        const skip = (page - 1) * limit;
+
+        try {
+            let result = await UniqueIdModal.find({userId : query.userId}).skip(skip).limit(limit).sort({ currentTime: -1 });
+            let count = await UniqueIdModal.find({userId : query.userId}).count();
+            res.status(200).send({data:result,count});
+        } catch (error) {
+            res.status(400).send({ "msg": "Some Error" });
+            console.log(error.message);
+        }
+    } else {
+        const skip = (page - 1) * limit;
+
+        try {
+            let result = await UniqueIdModal.find(query).sort({ currentTime: -1 });
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(400).send({ "msg": "Some Error" });
+            console.log(error.message);
+        }
     }
 });
+
+uniqueTimerRoute.patch("/:id",async (req,res) => {
+    const id = req.params.id;
+    const payload = req.body;
+
+    try {
+        const data = await UniqueIdModal.findByIdAndUpdate(id,payload);
+        res.send({"msg":"price updated Successfully"})
+    } catch (error) {
+        console.log(error);
+    }
+})
 
 module.exports = { uniqueTimerRoute };
